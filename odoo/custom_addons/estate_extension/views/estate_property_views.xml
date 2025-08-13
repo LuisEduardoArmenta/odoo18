@@ -1,0 +1,46 @@
+<odoo>
+    <!-- Heredar y extender la vista de lista -->
+    <record id="view_estate_property_list_inherited" model="ir.ui.view">
+        <field name="name">estate.property.list.inherited</field>
+        <field name="model">estate.property</field>
+        <field name="inherit_id" ref="estate.view_estate_property_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_availability']" position="after">
+                <field name="year_built"/>
+                <field name="energy_rating"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Heredar y extender la vista de formulario -->
+    <record id="view_estate_property_form_inherited" model="ir.ui.view">
+        <field name="name">estate.property.form.inherited</field>
+        <field name="model">estate.property</field>
+        <field name="inherit_id" ref="estate.view_estate_property_form"/>
+        <field name="arch" type="xml">
+            <!-- Agregar campos en el grupo "Property Details" -->
+            <xpath expr="//group[@string='Property Details']" position="inside">
+                <field name="parking_spaces"/>
+                <field name="year_built"/>
+                <field name="energy_rating"/>
+                <field name="property_age"/>
+            </xpath>
+            
+            <!-- Agregar una nueva pestaña -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Additional Info">
+                    <group>
+                        <group string="Property Age">
+                            <field name="property_age" readonly="1"/>
+                            <field name="year_built"/>
+                        </group>
+                        <group string="Energy & Parking">
+                            <field name="energy_rating"/>
+                            <field name="parking_spaces"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo> 
