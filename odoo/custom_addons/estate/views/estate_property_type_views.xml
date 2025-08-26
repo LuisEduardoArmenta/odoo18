@@ -6,8 +6,9 @@
         <field name="type">list</field>
         <field name="arch" type="xml">
             <list>
+                <field name="sequence" widget="handle"/>
                 <field name="name"/>
-                <field name="sequence"/>
+                <field name="property_count"/>
             </list>
         </field>
     </record>
@@ -19,17 +20,50 @@
         <field name="arch" type="xml">
             <form string="Property Type">
                 <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Property type name..." class="o_text_overflow"/>
+                        </h1>
+                    </div>
                     <group>
-                        <field name="name"/>
-                        <field name="sequence"/>
+                        <group string="Basic Information">
+                            <field name="sequence"/>
+                        </group>
+                        <group string="Statistics">
+                            <field name="property_count"/>
+                        </group>
                     </group>
                     <notebook>
-                        <page string="Properties">
-                            <field name="property_ids"/>
+                        <page string="Properties" name="properties">
+                            <field name="property_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="state"/>
+                                    <field name="expected_price"/>
+                                    <field name="selling_price"/>
+                                    <field name="date_availability"/>
+                                </list>
+                            </field>
                         </page>
                     </notebook>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <!-- Vista de búsqueda -->
+    <record id="view_estate_property_type_search" model="ir.ui.view">
+        <field name="name">estate.property.type.search</field>
+        <field name="model">estate.property.type</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Search Property Types">
+                <field name="name"/>
+                <field name="sequence"/>
+                <group expand="0" string="Group By">
+                    <filter string="Sequence" name="group_by_sequence" context="{'group_by': 'sequence'}"/>
+                </group>
+            </search>
         </field>
     </record>
 

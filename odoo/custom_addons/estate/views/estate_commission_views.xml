@@ -1,0 +1,56 @@
+<odoo>
+    <data>
+        <!-- Commission Tree View -->
+        <record id="view_estate_commission_tree" model="ir.ui.view">
+            <field name="name">estate.commission.tree</field>
+            <field name="model">estate.commission</field>
+            <field name="type">list</field>
+            <field name="arch" type="xml">
+                <list string="Commissions">
+                    <field name="name"/>
+                    <field name="property_id"/>
+                    <field name="agent_id"/>
+                    <field name="amount" widget="monetary"/>
+                    <field name="date"/>
+                    <field name="state"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Commission Form View -->
+        <record id="view_estate_commission_form" model="ir.ui.view">
+            <field name="name">estate.commission.form</field>
+            <field name="model">estate.commission</field>
+            <field name="arch" type="xml">
+                <form string="Commission">
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,paid"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="property_id"/>
+                            <field name="agent_id"/>
+                            <field name="amount" widget="monetary"/>
+                            <field name="date"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Commission Action -->
+        <record id="action_estate_commission" model="ir.actions.act_window">
+            <field name="name">Commissions</field>
+            <field name="res_model">estate.commission</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <!-- Commission Menu -->
+        <menuitem id="menu_estate_commission"
+                  name="Commissions"
+                  parent="menu_estate_root"
+                  action="action_estate_commission"
+                  sequence="30"/>
+    </data>
+</odoo>

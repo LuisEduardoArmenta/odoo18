@@ -8,6 +8,8 @@
             <list>
                 <field name="name"/>
                 <field name="color" widget="color_picker"/>
+                <field name="property_count"/>
+                <field name="description"/>
             </list>
         </field>
     </record>
@@ -19,12 +21,40 @@
         <field name="arch" type="xml">
             <form string="Property Tag">
                 <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Tag name..." class="o_text_overflow"/>
+                        </h1>
+                    </div>
                     <group>
-                        <field name="name"/>
-                        <field name="color" widget="color_picker"/>
+                        <group string="Basic Information">
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                        <group string="Statistics">
+                            <field name="property_count"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" placeholder="Describe what this tag represents..." nolabel="1"/>
                     </group>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <!-- Vista de búsqueda -->
+    <record id="view_estate_property_tag_search" model="ir.ui.view">
+        <field name="name">estate.property.tag.search</field>
+        <field name="model">estate.property.tag</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Search Property Tags">
+                <field name="name"/>
+                <field name="description"/>
+                <group expand="0" string="Group By">
+                    <filter string="Color" name="group_by_color" context="{'group_by': 'color'}"/>
+                </group>
+            </search>
         </field>
     </record>
 
@@ -37,5 +67,5 @@
 
     <!-- Menú para Property Tag -->
     <menuitem id="menu_estate_property_tag" name="Property Tags" 
-              parent="menu_estate_root" action="action_estate_property_tag" sequence="30"/>
+            parent="menu_estate_root" action="action_estate_property_tag" sequence="30"/>
 </odoo> 

@@ -4,7 +4,71 @@
     <record id="action_estate_property" model="ir.actions.act_window">
         <field name="name">Properties</field>
         <field name="res_model">estate.property</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_available': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first property!
+            </p>
+            <p>
+                Create beautiful property listings to manage your real estate business.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Vista Kanban Simplificada -->
+    <record id="view_estate_property_kanban" model="ir.ui.view">
+        <field name="name">estate.property.kanban</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="name"/>
+                <field name="expected_price"/>
+                <field name="state"/>
+                <field name="property_type_id"/>
+                <field name="tag_ids"/>
+                <field name="bedrooms"/>
+                <field name="living_area"/>
+                <field name="garden"/>
+                <field name="garage"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div>
+                                    <strong><t t-esc="record.name.value"/></strong>
+                                </div>
+                                <div class="text-muted">
+                                    <t t-esc="record.property_type_id.value"/>
+                                </div>
+                                <div class="mt-2">
+                                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                </div>
+                                <div class="mt-2 d-flex justify-content-between">
+                                    <small class="text-muted">
+                                        <t t-if="record.bedrooms.raw_value">
+                                            🛏️ <t t-esc="record.bedrooms.value"/>
+                                        </t>
+                                        <t t-if="record.living_area.raw_value">
+                                            | 📐 <t t-esc="record.living_area.value"/>m²
+                                        </t>
+                                        <t t-if="record.garden.raw_value">
+                                            | 🌳
+                                        </t>
+                                        <t t-if="record.garage.raw_value">
+                                            | 🚗
+                                        </t>
+                                    </small>
+                                    <span class="badge badge-primary">
+                                        $<t t-esc="record.expected_price.value"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
     </record>
 
     <!-- Menú principal -->
@@ -19,76 +83,184 @@
         <field name="model">estate.property</field>
         <field name="type">list</field>
         <field name="arch" type="xml">
-            <list>
+            <list decoration-success="state == 'sold'" 
+                  decoration-danger="state == 'cancelled'" 
+                  decoration-info="state == 'new'"
+                  decoration-warning="state in ['offer_received', 'offer_accepted']">
                 <field name="name"/>
-                <field name="expected_price"/>
-                <field name="state"/>
                 <field name="property_type_id"/>
                 <field name="postcode"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="bedrooms"/>
+                <field name="living_area"/>
+                <field name="total_area"/>
+                <field name="expected_price" widget="monetary"/>
+                <field name="best_price" widget="monetary"/>
+                <field name="selling_price" widget="monetary"/>
                 <field name="date_availability"/>
+                <field name="state" decoration-success="state == 'sold'" decoration-danger="state == 'cancelled'"/>
             </list>
         </field>
     </record>
 
-    <!-- Vista form mejorada -->
+    <!-- Vista form mejorada con campos del Capítulo 8 -->
     <record id="view_estate_property_form" model="ir.ui.view">
         <field name="name">estate.property.form</field>
         <field name="model">estate.property</field>
         <field name="arch" type="xml">
             <form string="Property">
                 <header>
-                    <button name="action_sold" string="Sold" type="object" class="oe_highlight"/>
-                    <button name="action_cancel" string="Cancel" type="object"/>
-                    <field name="state" widget="statusbar" statusbar_visible="new,offer_received,offer_accepted"/>
+                    <button name="action_sold" string="Mark as Sold" type="object" 
+                            class="oe_highlight" confirm="Are you sure you want to mark this property as sold?"
+                            invisible="state in ['sold', 'cancelled']"/>
+                    <button name="action_cancel" string="Cancel Property" type="object"
+                            confirm="Are you sure you want to cancel this property?"
+                            invisible="state in ['sold', 'cancelled']"/>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="new,offer_received,offer_accepted,sold"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
                         <h1>
-                            <field name="name" placeholder="Property name..."/>
+                            <field name="name" placeholder="Property name..." class="o_text_overflow"/>
                         </h1>
+                        <div class="o_row">
+                            <field name="tag_ids" widget="many2many_tags" 
+                                   options="{'color_field': 'color', 'no_create': False}"/>
+                        </div>
                     </div>
+                    
+                    <!-- Alert para propiedades canceladas o vendidas -->
+                    <div class="alert alert-warning" role="alert" invisible="state not in ['cancelled', 'sold']">
+                        <strong>Status:</strong> This property is <field name="state" readonly="1"/> and cannot be modified.
+                    </div>
+                    
+                    <!-- CAPÍTULO 8: Nueva sección para campos de validez y fecha límite -->
+                    <group string="Validity Information">
+                        <field name="validity" invisible="state in ['sold', 'cancelled']"/>
+                        <field name="date_deadline" invisible="state in ['sold', 'cancelled']"/>
+                    </group>
+                    
                     <group>
                         <group string="Basic Information">
-                            <field name="property_type_id"/>
-                            <field name="postcode"/>
+                            <field name="property_type_id" options="{'no_create': False, 'no_edit': False}"/>
+                            <field name="postcode" placeholder="e.g. 12345"/>
                             <field name="date_availability"/>
-                            <field name="expected_price"/>
-                            <field name="selling_price"/>
                         </group>
+                        <group string="Financial Information">
+                            <field name="expected_price" widget="monetary"/>
+                            <field name="selling_price" widget="monetary" readonly="1"/>
+                            <field name="best_price" widget="monetary" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group>
                         <group string="Property Details">
                             <field name="bedrooms"/>
-                            <field name="living_area"/>
+                            <field name="living_area" string="Living Area (m²)"/>
                             <field name="facades"/>
                             <field name="garage"/>
-                            <field name="garden"/>
-                            <field name="total_area"/>
+                        </group>
+                        <group string="Computed Information">
+                            <field name="total_area" readonly="1" string="Total Area (m²)"/>
                         </group>
                     </group>
+                    
                     <notebook>
-                        <page string="Description">
-                            <field name="description" placeholder="Describe the property..."/>
+                        <page string="Offers">
+                            <field name="offer_ids">
+                                <list decoration-success="status == 'accepted'" 
+                                      decoration-danger="status == 'refused'"
+                                      decoration-info="not status"
+                                      editable="bottom">
+                                    <field name="price" widget="monetary"/>
+                                    <field name="partner_id"/>
+                                    <field name="validity"/>
+                                    <field name="date_deadline"/>
+                                    <field name="status"/>
+                                    <button name="action_accept" string="Accept" type="object" 
+                                            class="btn-success fa fa-check" title="Accept Offer"
+                                            invisible="status"/>
+                                    <button name="action_refuse" string="Refuse" type="object" 
+                                            class="btn-danger fa fa-times" title="Refuse Offer"
+                                            invisible="status"/>
+                                </list>
+                            </field>
                         </page>
+                        
+                        <page string="Description">
+                            <field name="description" placeholder="Describe the property in detail..." nolabel="1"/>
+                        </page>
+                        
+                        <!-- CAPÍTULO 8: Página de Garden mejorada con onchange visible -->
                         <page string="Garden">
                             <group>
-                                <field name="garden"/>
-                                <field name="garden_area"/>
-                                <field name="garden_orientation"/>
+                                <group string="Garden Information">
+                                    <field name="garden" string="Has Garden"/>
+                                    <field name="garden_area" string="Garden Area (m²)" 
+                                           readonly="not garden" required="garden"/>
+                                    <field name="garden_orientation" string="Garden Orientation" 
+                                           readonly="not garden" required="garden"/>
+                                </group>
+                            </group>
+                            <!-- Nota informativa sobre el comportamiento del onchange -->
+                            <div class="alert alert-info" role="alert">
+                                <strong>Info:</strong> When you check "Has Garden", the garden area will automatically be set to 10 m² and orientation to North. You can modify these values after enabling the garden.
+                            </div>
+                        </page>
+                        
+                        <page string="Other Information">
+                            <group>
+                                <group string="People">
+                                    <field name="salesperson_id" domain="[('share', '=', False)]"/>
+                                    <field name="buyer_id" readonly="state != 'offer_accepted'"/>
+                                </group>
                             </group>
                         </page>
-                        <page string="Tags">
-                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
-                        </page>
                     </notebook>
-                    <group>
-                        <group string="Salesperson">
-                            <field name="salesperson_id"/>
-                        </group>
-                        <group string="Buyer">
-                            <field name="buyer_id"/>
-                        </group>
-                    </group>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <!-- CAPÍTULO 8: Vista de búsqueda mejorada -->
+    <record id="view_estate_property_search" model="ir.ui.view">
+        <field name="name">estate.property.search</field>
+        <field name="model">estate.property</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Search Properties">
+                <field name="name"/>
+                <field name="property_type_id"/>
+                <field name="tag_ids"/>
+                <field name="postcode"/>
+                <field name="salesperson_id"/>
+                <field name="buyer_id"/>
+                
+                <!-- Filtros predefinidos -->
+                <filter string="Available" name="available" domain="[('state', '=', 'new')]"/>
+                <filter string="Offers Received" name="offers_received" domain="[('state', '=', 'offer_received')]"/>
+                <filter string="Offers Accepted" name="offers_accepted" domain="[('state', '=', 'offer_accepted')]"/>
+                <filter string="Sold" name="sold" domain="[('state', '=', 'sold')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+                
+                <separator/>
+                <filter string="Has Garden" name="has_garden" domain="[('garden', '=', True)]"/>
+                <filter string="Has Garage" name="has_garage" domain="[('garage', '=', True)]"/>
+                <filter string="Large Properties" name="large_properties" domain="[('total_area', '>=', 100)]"/>
+                
+                <separator/>
+                <filter string="My Properties" name="my_properties" domain="[('salesperson_id', '=', uid)]"/>
+                
+                <!-- Agrupaciones -->
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                    <filter string="Property Type" name="group_by_type" context="{'group_by': 'property_type_id'}"/>
+                    <filter string="Salesperson" name="group_by_salesperson" context="{'group_by': 'salesperson_id'}"/>
+                    <filter string="Has Garden" name="group_by_garden" context="{'group_by': 'garden'}"/>
+                    <filter string="Availability Month" name="group_by_month" context="{'group_by': 'date_availability:month'}"/>
+                </group>
+            </search>
         </field>
     </record>
 

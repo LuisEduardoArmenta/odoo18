@@ -1,0 +1,91 @@
+<odoo>
+    <!-- Vista simplificada para contactos con Real Estate -->
+    <record id="view_partner_form_estate_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.estate.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Real Estate" name="real_estate"
+                      invisible="not is_real_estate_agent">
+                    <group>
+                        <group string="Agent Information">
+                            <field name="is_real_estate_agent"/>
+                            <field name="agent_license" required="is_real_estate_agent"/>
+                            <field name="specialization" required="is_real_estate_agent"/>
+                            <field name="commission_rate" widget="percentage"/>
+                        </group>
+                        <group string="Performance Stats">
+                            <field name="total_properties_sold" readonly="1"/>
+                            <field name="total_sales_amount" widget="monetary" readonly="1"/>
+                            <field name="average_property_price" widget="monetary" readonly="1"/>
+                            <field name="success_rate" widget="percentage" readonly="1"/>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+            <field name="category_id" position="after">
+                <field name="is_real_estate_agent"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Action for Real Estate Agents -->
+    <record id="action_real_estate_agents" model="ir.actions.act_window">
+        <field name="name">Real Estate Agents</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('is_real_estate_agent', '=', True)]</field>
+        <field name="context">{'default_is_real_estate_agent': True}</field>
+    </record>
+
+    <!-- Kanban view for Real Estate Agents -->
+    <record id="view_real_estate_agents_kanban" model="ir.ui.view">
+        <field name="name">real.estate.agents.kanban</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <field name="name"/>
+                <field name="specialization"/>
+                <field name="commission_rate"/>
+                <field name="total_properties_sold"/>
+                <field name="total_sales_amount"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="oe_kanban_details">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                    </strong>
+                                    <div class="o_kanban_record_subtitle">
+                                        <field name="specialization"/>
+                                    </div>
+                                    <div class="oe_kanban_footer">
+                                        <div class="o_kanban_record_bottom">
+                                            <div class="oe_kanban_bottom_left">
+                                                <span>Commission: <field name="commission_rate"/>%</span>
+                                            </div>
+                                            <div class="oe_kanban_bottom_right">
+                                                <span>Sales: <field name="total_properties_sold"/></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Menu for Real Estate Agents -->
+    <menuitem id="menu_real_estate_agents"
+              name="Agents"
+              parent="menu_estate_root"
+              action="action_real_estate_agents"
+              sequence="10"/>
+
+</odoo>

@@ -1,0 +1,311 @@
+<odoo>
+    <!-- Reporte de Propiedades -->
+    <record id="action_report_estate_properties" model="ir.actions.report">
+        <field name="name">Property Report</field>
+        <field name="model">estate.property</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">estate.report_estate_property</field>
+        <field name="report_file">estate.report_estate_property</field>
+        <field name="binding_model_id" ref="model_estate_property"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Template del Reporte -->
+    <template id="report_estate_property">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="property">
+                <div class="page">
+                    <style>
+                        @font-face {
+                            font-family: 'DejaVu Sans';
+                            src: url('data:font/truetype;charset=utf-8;base64,');
+                            font-weight: normal;
+                            font-style: normal;
+                        }
+                        
+                        * {
+                            font-family: 'DejaVu Sans', 'Helvetica', Arial, sans-serif;
+                        }
+                        
+                        .header-section {
+                            background: #1e3a8a;
+                            color: white;
+                            padding: 25px;
+                            margin: -20px -20px 25px -20px;
+                            text-align: center;
+                        }
+                        .property-title {
+                            font-size: 24px;
+                            font-weight: bold;
+                            margin-bottom: 8px;
+                        }
+                        .property-type {
+                            font-size: 14px;
+                            opacity: 0.9;
+                        }
+                        .price-section {
+                            text-align: center;
+                            background: #f8f9fa;
+                            padding: 20px;
+                            margin: 20px 0;
+                            border: 3px solid #28a745;
+                        }
+                        .price-amount {
+                            font-size: 28px;
+                            font-weight: bold;
+                            color: #28a745;
+                            margin-bottom: 8px;
+                        }
+                        .status-badge {
+                            display: inline-block;
+                            padding: 6px 12px;
+                            font-weight: bold;
+                            font-size: 12px;
+                            text-transform: uppercase;
+                            border: 1px solid #000;
+                        }
+                        .status-sold { background: #d4edda; color: #155724; }
+                        .status-new { background: #d1ecf1; color: #0c5460; }
+                        .status-offer_received { background: #fff3cd; color: #856404; }
+                        .status-cancelled { background: #f8d7da; color: #721c24; }
+                        
+                        .details-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin: 20px 0;
+                        }
+                        .details-table td {
+                            padding: 8px 12px;
+                            border: 1px solid #ddd;
+                            vertical-align: top;
+                        }
+                        .details-table .section-header {
+                            background: #f1f3f4;
+                            font-weight: bold;
+                            text-align: center;
+                            font-size: 16px;
+                            padding: 12px;
+                        }
+                        .detail-label {
+                            font-weight: 600;
+                            color: #333;
+                            width: 40%;
+                        }
+                        .detail-value {
+                            color: #666;
+                        }
+                        
+                        .offers-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 20px;
+                        }
+                        .offers-table th {
+                            background: #343a40;
+                            color: white;
+                            padding: 12px 8px;
+                            font-weight: bold;
+                            border: 1px solid #000;
+                            text-align: center;
+                        }
+                        .offers-table td {
+                            padding: 10px 8px;
+                            border: 1px solid #ddd;
+                            text-align: center;
+                        }
+                        .offers-table tr:nth-child(even) {
+                            background: #f8f9fa;
+                        }
+                        .offer-accepted { color: #28a745; font-weight: bold; }
+                        .offer-refused { color: #dc3545; font-weight: bold; }
+                        .offer-pending { color: #ffc107; font-weight: bold; }
+                        
+                        .description-section {
+                            background: #f8f9fa;
+                            padding: 15px;
+                            margin-top: 20px;
+                            border: 1px solid #ddd;
+                        }
+                        .section-title {
+                            font-size: 16px;
+                            font-weight: bold;
+                            margin-bottom: 10px;
+                            color: #333;
+                            text-transform: uppercase;
+                        }
+                        .tag-item {
+                            display: inline-block;
+                            background: #6c757d;
+                            color: white;
+                            padding: 4px 8px;
+                            font-size: 11px;
+                            margin-right: 5px;
+                            margin-bottom: 3px;
+                        }
+                        .footer-info {
+                            margin-top: 30px;
+                            text-align: center;
+                            font-size: 10px;
+                            color: #666;
+                            border-top: 1px solid #ddd;
+                            padding-top: 10px;
+                        }
+                    </style>
+                    
+                    <!-- Header profesional -->
+                    <div class="header-section">
+                        <div class="property-title">
+                            <span t-field="property.name"/>
+                        </div>
+                        <div class="property-type">
+                            Tipo: <span t-field="property.property_type_id"/>
+                        </div>
+                    </div>
+                    
+                    <!-- Precio y Estado -->
+                    <div class="price-section">
+                        <div class="price-amount">
+                            <span t-field="property.expected_price" 
+                                  t-options="{'widget': 'monetary', 'display_currency': property.company_id.currency_id}"/>
+                        </div>
+                        <div>
+                            <span t-att-class="'status-badge status-' + property.state" t-field="property.state"/>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabla de Detalles Principal -->
+                    <table class="details-table">
+                        <tr>
+                            <td colspan="4" class="section-header">INFORMACION DE LA PROPIEDAD</td>
+                        </tr>
+                        <tr>
+                            <td class="detail-label">Dormitorios:</td>
+                            <td class="detail-value"><span t-field="property.bedrooms"/></td>
+                            <td class="detail-label">Area Habitable:</td>
+                            <td class="detail-value"><span t-field="property.living_area"/> m²</td>
+                        </tr>
+                        <tr>
+                            <td class="detail-label">Area Total:</td>
+                            <td class="detail-value"><span t-field="property.total_area"/> m²</td>
+                            <td class="detail-label">Fachadas:</td>
+                            <td class="detail-value"><span t-field="property.facades"/></td>
+                        </tr>
+                        <tr>
+                            <td class="detail-label">Garaje:</td>
+                            <td class="detail-value">
+                                <span t-if="property.garage" style="color: #28a745;">SI</span>
+                                <span t-if="not property.garage" style="color: #dc3545;">NO</span>
+                            </td>
+                            <td class="detail-label">Disponible desde:</td>
+                            <td class="detail-value">
+                                <span t-field="property.date_availability" t-options="{'widget': 'date'}"/>
+                            </td>
+                        </tr>
+                        <tr t-if="property.garden">
+                            <td class="detail-label">Area del Jardin:</td>
+                            <td class="detail-value"><span t-field="property.garden_area"/> m²</td>
+                            <td class="detail-label">Orientacion del Jardin:</td>
+                            <td class="detail-value"><span t-field="property.garden_orientation"/></td>
+                        </tr>
+                        
+                        <tr>
+                            <td colspan="4" class="section-header">INFORMACION DE CONTACTO</td>
+                        </tr>
+                        <tr t-if="property.salesperson_id">
+                            <td class="detail-label">Vendedor:</td>
+                            <td class="detail-value"><span t-field="property.salesperson_id"/></td>
+                            <td class="detail-label">Comprador:</td>
+                            <td class="detail-value">
+                                <span t-if="property.buyer_id" t-field="property.buyer_id"/>
+                                <span t-if="not property.buyer_id">-</span>
+                            </td>
+                        </tr>
+                        <tr t-if="property.selling_price">
+                            <td class="detail-label">Precio de Venta:</td>
+                            <td class="detail-value" style="color: #28a745; font-weight: bold;">
+                                <span t-field="property.selling_price" 
+                                      t-options="{'widget': 'monetary', 'display_currency': property.company_id.currency_id}"/>
+                            </td>
+                            <td class="detail-label">Mejor Oferta:</td>
+                            <td class="detail-value" style="color: #007bff; font-weight: bold;">
+                                <span t-if="property.best_price" 
+                                      t-field="property.best_price" 
+                                      t-options="{'widget': 'monetary', 'display_currency': property.company_id.currency_id}"/>
+                                <span t-if="not property.best_price">-</span>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <!-- Etiquetas -->
+                    <div t-if="property.tag_ids" style="margin: 20px 0;">
+                        <div class="section-title">Etiquetas</div>
+                        <t t-foreach="property.tag_ids" t-as="tag">
+                            <span class="tag-item" t-field="tag.name"/>
+                        </t>
+                    </div>
+                    
+                    <!-- Descripcion -->
+                    <div class="description-section" t-if="property.description">
+                        <div class="section-title">Descripcion</div>
+                        <p t-field="property.description" style="margin-top: 10px; line-height: 1.5;"/>
+                    </div>
+                    
+                    <!-- Tabla de Ofertas -->
+                    <div t-if="property.offer_ids" style="margin-top: 30px;">
+                        <div class="section-title">Historial de Ofertas</div>
+                        <table class="offers-table">
+                            <thead>
+                                <tr>
+                                    <th>Socio</th>
+                                    <th>Precio Ofertado</th>
+                                    <th>Validez (dias)</th>
+                                    <th>Fecha Limite</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="property.offer_ids" t-as="offer">
+                                    <tr>
+                                        <td><span t-field="offer.partner_id"/></td>
+                                        <td>
+                                            <span t-field="offer.price" 
+                                                  t-options="{'widget': 'monetary', 'display_currency': property.company_id.currency_id}"/>
+                                        </td>
+                                        <td><span t-field="offer.validity"/></td>
+                                        <td>
+                                            <span t-field="offer.date_deadline" t-options="{'widget': 'date'}"/>
+                                        </td>
+                                        <td>
+                                            <span t-if="offer.status == 'accepted'" class="offer-accepted">
+                                                ACEPTADA
+                                            </span>
+                                            <span t-if="offer.status == 'refused'" class="offer-refused">
+                                                RECHAZADA
+                                            </span>
+                                            <span t-if="not offer.status" class="offer-pending">
+                                                PENDIENTE
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div class="footer-info">
+                        <strong>Estate Real Estate</strong> | 
+                        Reporte generado el <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/> | 
+                        Propiedad ID: <span t-field="property.id"/>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+    
+    <!-- Menú del reporte -->
+    <menuitem id="menu_estate_reports" 
+              name="Reports" 
+              parent="menu_estate_root" 
+              sequence="30"/>
+</odoo>

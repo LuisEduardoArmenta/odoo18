@@ -34,7 +34,7 @@
                             <field name="property_age" readonly="1"/>
                             <field name="year_built"/>
                         </group>
-                        <group string="Energy & Parking">
+                        <group string="Energy &amp; Parking">
                             <field name="energy_rating"/>
                             <field name="parking_spaces"/>
                         </group>
@@ -43,4 +43,4 @@
             </xpath>
         </field>
     </record>
-</odoo> 
+</odoo>

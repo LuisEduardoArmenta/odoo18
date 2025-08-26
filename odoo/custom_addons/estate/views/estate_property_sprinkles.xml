@@ -1,0 +1,47 @@
+<odoo>
+    <!-- Sprinkles: Mejoras visuales y funcionales -->
+    
+    <!-- Mejoras básicas para la vista de propiedades -->
+    <record id="view_estate_property_form_sprinkles" model="ir.ui.view">
+        <field name="name">estate.property.form.sprinkles</field>
+        <field name="model">estate.property</field>
+        <field name="inherit_id" ref="view_estate_property_form"/>
+        <field name="arch" type="xml">
+            <!-- Agregar widget de imagen para la propiedad -->
+            <div class="oe_title" position="before">
+                <field name="image" widget="image" class="oe_avatar" 
+                       options="{'preview_image': 'image', 'size': [90, 90]}"/>
+            </div>
+            
+            <!-- Agregar campos de coordenadas después de la fecha -->
+            <field name="date_availability" position="after">
+                <field name="latitude" widget="float" digits="[8,6]"/>
+                <field name="longitude" widget="float" digits="[8,6]"/>
+            </field>
+            
+            <!-- Agregar nueva página de análisis -->
+            <field name="buyer_id" position="after">
+                <separator string="Analytics"/>
+                <group>
+                    <group string="Market Analysis">
+                        <field name="price_per_sqm" readonly="1" widget="monetary"/>
+                        <field name="days_on_market" readonly="1"/>
+                        <field name="offer_count" readonly="1"/>
+                        <field name="avg_offer_price" readonly="1" widget="monetary"/>
+                    </group>
+                    <group string="Performance Indicators">
+                        <field name="price_vs_expected" readonly="1" widget="percentage"/>
+                        <field name="market_attractiveness" readonly="1" widget="progressbar"/>
+                    </group>
+                </group>
+            </field>
+        </field>
+    </record>
+
+    <!-- Menú del Dashboard -->
+    <menuitem id="menu_estate_dashboard" 
+              name="Dashboard" 
+              parent="menu_estate_root" 
+              sequence="1"/>
+
+</odoo>

@@ -1,0 +1,157 @@
+<odoo>
+    <data>
+        <!-- Datos de demostración para agentes inmobiliarios -->
+        
+        <!-- Agente 1: María González -->
+        <record id="agent_maria_gonzalez" model="res.partner">
+            <field name="name">María González</field>
+            <field name="is_company" eval="False"/>
+            <field name="email">maria.gonzalez@realestate.com</field>
+            <field name="phone">+1-555-0101</field>
+            <field name="is_real_estate_agent" eval="True"/>
+            <field name="agent_license">AG-2024-001</field>
+            <field name="specialization">luxury</field>
+            <field name="commission_rate">3.5</field>
+        </record>
+        
+        <!-- Agente 2: Carlos Rodríguez -->
+        <record id="agent_carlos_rodriguez" model="res.partner">
+            <field name="name">Carlos Rodríguez</field>
+            <field name="is_company" eval="False"/>
+            <field name="email">carlos.rodriguez@realestate.com</field>
+            <field name="phone">+1-555-0102</field>
+            <field name="is_real_estate_agent" eval="True"/>
+            <field name="agent_license">AG-2024-002</field>
+            <field name="specialization">residential</field>
+            <field name="commission_rate">3.0</field>
+        </record>
+        
+        <!-- Agente 3: Ana López -->
+        <record id="agent_ana_lopez" model="res.partner">
+            <field name="name">Ana López</field>
+            <field name="is_company" eval="False"/>
+            <field name="email">ana.lopez@realestate.com</field>
+            <field name="phone">+1-555-0103</field>
+            <field name="is_real_estate_agent" eval="True"/>
+            <field name="agent_license">AG-2024-003</field>
+            <field name="specialization">commercial</field>
+            <field name="commission_rate">4.0</field>
+        </record>
+        
+        <!-- Compradores de ejemplo -->
+        <record id="buyer_john_doe" model="res.partner">
+            <field name="name">John Doe</field>
+            <field name="is_company" eval="False"/>
+            <field name="email">john.doe@email.com</field>
+            <field name="phone">+1-555-1001</field>
+        </record>
+        
+        <record id="buyer_jane_smith" model="res.partner">
+            <field name="name">Jane Smith</field>
+            <field name="is_company" eval="False"/>
+            <field name="email">jane.smith@email.com</field>
+            <field name="phone">+1-555-1002</field>
+        </record>
+        
+        <!-- Propiedades de ejemplo con coordenadas -->
+        <record id="property_luxury_villa" model="estate.property">
+            <field name="name">Luxury Villa with Pool</field>
+            <field name="description">Beautiful luxury villa with swimming pool and garden</field>
+            <field name="property_type_id" ref="property_type_house"/>
+            <field name="postcode">90210</field>
+            <field name="date_availability">2024-09-01</field>
+            <field name="expected_price">850000</field>
+            <field name="selling_price">820000</field>
+            <field name="bedrooms">4</field>
+            <field name="living_area">250</field>
+            <field name="facades">2</field>
+            <field name="garage" eval="True"/>
+            <field name="garden" eval="True"/>
+            <field name="garden_area">500</field>
+            <field name="garden_orientation">north</field>
+            <field name="latitude">34.0901</field>
+            <field name="longitude">-118.4065</field>
+            <field name="salesperson_id" ref="base.user_admin"/>
+            <field name="buyer_id" ref="buyer_john_doe"/>
+            <field name="state">sold</field>
+        </record>
+        
+        <record id="property_modern_apartment" model="estate.property">
+            <field name="name">Modern Downtown Apartment</field>
+            <field name="description">Stylish apartment in the heart of downtown</field>
+            <field name="property_type_id" ref="property_type_apartment"/>
+            <field name="postcode">10001</field>
+            <field name="date_availability">2024-08-15</field>
+            <field name="expected_price">450000</field>
+            <field name="bedrooms">2</field>
+            <field name="living_area">80</field>
+            <field name="facades">1</field>
+            <field name="garage" eval="False"/>
+            <field name="garden" eval="False"/>
+            <field name="latitude">40.7589</field>
+            <field name="longitude">-73.9851</field>
+            <field name="salesperson_id" ref="base.user_admin"/>
+            <field name="state">offer_received</field>
+        </record>
+        
+        <record id="property_commercial_office" model="estate.property">
+            <field name="name">Prime Commercial Office Space</field>
+            <field name="description">Premium office space in business district</field>
+            <field name="property_type_id" ref="property_type_house"/>
+            <field name="postcode">60601</field>
+            <field name="date_availability">2024-10-01</field>
+            <field name="expected_price">1200000</field>
+            <field name="living_area">300</field>
+            <field name="facades">4</field>
+            <field name="garage" eval="True"/>
+            <field name="garden" eval="False"/>
+            <field name="latitude">41.8818</field>
+            <field name="longitude">-87.6231</field>
+            <field name="salesperson_id" ref="base.user_admin"/>
+            <field name="state">new</field>
+        </record>
+        
+        <!-- Ofertas de ejemplo -->
+        <record id="offer_villa_1" model="estate.offer">
+            <field name="price">800000</field>
+            <field name="partner_id" ref="buyer_john_doe"/>
+            <field name="property_id" ref="property_luxury_villa"/>
+            <field name="validity">7</field>
+            <field name="status">accepted</field>
+        </record>
+        
+        <record id="offer_apartment_1" model="estate.offer">
+            <field name="price">430000</field>
+            <field name="partner_id" ref="buyer_jane_smith"/>
+            <field name="property_id" ref="property_modern_apartment"/>
+            <field name="validity">10</field>
+            <field name="status">refused</field>
+        </record>
+        
+        <record id="offer_apartment_2" model="estate.offer">
+            <field name="price">445000</field>
+            <field name="partner_id" ref="buyer_john_doe"/>
+            <field name="property_id" ref="property_modern_apartment"/>
+            <field name="validity">14</field>
+            <field name="status">accepted</field>
+        </record>
+        
+        <!-- Comisiones de ejemplo -->
+        <record id="commission_villa_maria" model="estate.commission">
+            <field name="property_id" ref="property_luxury_villa"/>
+            <field name="agent_id" ref="agent_maria_gonzalez"/>
+            <field name="amount">28700</field> <!-- 3.5% de 820,000 -->
+            <field name="date">2024-08-20</field>
+            <field name="state">paid</field>
+        </record>
+        
+        <record id="commission_apartment_carlos" model="estate.commission">
+            <field name="property_id" ref="property_modern_apartment"/>
+            <field name="agent_id" ref="agent_carlos_rodriguez"/>
+            <field name="amount">13350</field> <!-- 3% de 445,000 -->
+            <field name="date">2024-08-25</field>
+            <field name="state">draft</field>
+        </record>
+        
+    </data>
+</odoo>

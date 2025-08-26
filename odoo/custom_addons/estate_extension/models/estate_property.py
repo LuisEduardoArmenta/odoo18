@@ -28,10 +28,17 @@ class EstateProperty(models.Model):
     
     # Método que extiende funcionalidad existente
     def action_sold(self):
-        # Llamar al método original
-        result = super().action_sold()
-        # Agregar funcionalidad adicional
-        for record in self:
-            if record.property_age > 50:
-                record.description = f"{record.description or ''}\n\n⚠️ Property is over 50 years old!"
+        result = super(EstateProperty, self).action_sold()
+        for prop in self:
+            # Logica de la comision
+            if prop.salesperson_id and prop.selling_price > 0:
+                agent = prop.salesperson_id.partner_id
+                if agent and agent.is_real_estate_agent:
+                    commission_amount = prop.selling_price * (agent.commission_rate / 100.0)
+                    if commission_amount > 0:
+                        self.env['estate.commission'].create({
+                            'property_id': prop.id,
+                            'agent_id': agent.id,
+                            'amount': commission_amount,
+                        })
         return result 
